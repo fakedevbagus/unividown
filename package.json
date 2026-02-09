@@ -2,10 +2,54 @@
   "name": "unividown",
   "version": "1.0.0",
   "description": "UniviDown - Universal Media Downloader for multiple platforms",
-  "main": "server.js",
+  "main": "electron/main.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "electron .",
+    "server": "node server.js",
+    "dev": "node server.js",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "pack": "electron-builder --dir"
+  },
+  "build": {
+    "appId": "com.unividown.app",
+    "productName": "UniviDown",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron/**/*",
+      "public/**/*",
+      "server.js",
+      "package.json",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "public/assets",
+        "to": "assets"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "public/assets/logouniversaldown.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": true,
+      "installerIcon": "public/assets/logouniversaldown.ico",
+      "uninstallerIcon": "public/assets/logouniversaldown.ico",
+      "installerHeaderIcon": "public/assets/logouniversaldown.ico"
+    }
   },
   "keywords": [
     "universal",
@@ -15,7 +59,9 @@
     "tiktok",
     "yt-dlp",
     "ffmpeg",
-    "multi-platform"
+    "multi-platform",
+    "electron",
+    "desktop"
   ],
   "author": "Personal Use",
   "license": "MIT",
@@ -23,6 +69,10 @@
     "express": "^4.18.2",
     "express-rate-limit": "^7.1.5",
     "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
   },
   "engines": {
     "node": ">=14.0.0"
