@@ -61,7 +61,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/unividown.git
+git clone https://github.com/fakedevbagus/unividown.git
 cd unividown
 
 # Install dependencies
@@ -137,6 +137,7 @@ UniviDown supports all platforms that yt-dlp supports, including:
 - Only download content that you have the rights to access
 - Respect copyright laws and terms of service of each platform
 - The developers are not responsible for any misuse of this software
+- use carefully high compatibility mode can make hardwork your cpu! 
 
 ## 📄 License
 
