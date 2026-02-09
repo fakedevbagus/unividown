@@ -7,17 +7,39 @@
 
 const { app, BrowserWindow, Tray, Menu, nativeImage } = require('electron');
 const path = require('path');
-const { spawn } = require('child_process');
+const { spawn, fork } = require('child_process');
 
 // Server process reference
 let serverProcess = null;
 let mainWindow = null;
 let tray = null;
 
+// Detect if running in packaged app
+const isPackaged = app.isPackaged;
+
+// Get base path (different for dev vs production)
+function getBasePath() {
+    if (isPackaged) {
+        // In packaged app, resources are in app.asar or unpacked
+        return path.join(process.resourcesPath, 'app');
+    }
+    return path.join(__dirname, '..');
+}
+
 // Paths
-const serverPath = path.join(__dirname, '..', 'server.js');
-const iconPath = path.join(__dirname, '..', 'public', 'assets', 'logouniversaldown.png');
-const icoPath = path.join(__dirname, '..', 'public', 'assets', 'logouniversaldown.ico');
+const basePath = getBasePath();
+const serverPath = path.join(basePath, 'server.js');
+const publicPath = path.join(basePath, 'public');
+const iconPath = path.join(publicPath, 'assets', 'logouniversaldown.png');
+const icoPath = path.join(publicPath, 'assets', 'logouniversaldown.ico');
+
+// Bin paths for ffmpeg and yt-dlp
+function getBinPath() {
+    if (isPackaged) {
+        return path.join(process.resourcesPath, 'bin');
+    }
+    return path.join(__dirname, '..', 'bin');
+}
 
 // Server URL
 const SERVER_URL = 'http://localhost:3000';
@@ -28,11 +50,27 @@ const SERVER_URL = 'http://localhost:3000';
 function startServer() {
     return new Promise((resolve, reject) => {
         console.log('🚀 Starting UniviDown server...');
+        console.log('📁 Base path:', basePath);
+        console.log('📁 Server path:', serverPath);
+        console.log('📁 Bin path:', getBinPath());
         
-        serverProcess = spawn('node', [serverPath], {
-            cwd: path.join(__dirname, '..'),
-            stdio: ['pipe', 'pipe', 'pipe'],
-            env: { ...process.env }
+        // Set environment variables for bin paths
+        const binPath = getBinPath();
+        const env = {
+            ...process.env,
+            UNIVIDOWN_BIN_PATH: binPath,
+            UNIVIDOWN_BASE_PATH: basePath,
+            PATH: `${binPath}${path.delimiter}${process.env.PATH}`
+        };
+
+        // Use fork instead of spawn for Node.js scripts
+        // This uses the embedded Node.js in Electron
+        serverProcess = fork(serverPath, [], {
+            cwd: basePath,
+            env: env,
+            stdio: ['pipe', 'pipe', 'pipe', 'ipc'],
+            execPath: process.execPath,
+            execArgv: []
         });
 
         serverProcess.stdout.on('data', (data) => {

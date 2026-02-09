@@ -14,6 +14,7 @@
   "build": {
     "appId": "com.unividown.app",
     "productName": "UniviDown",
+    "asar": true,
     "directories": {
       "output": "dist"
     },
@@ -22,12 +23,15 @@
       "public/**/*",
       "server.js",
       "package.json",
-      "node_modules/**/*"
+      "node_modules/**/*",
+      "!node_modules/*/{CHANGELOG.md,README.md,readme.md,test,tests,*.test.js}",
+      "!node_modules/.cache/**/*"
     ],
     "extraResources": [
       {
-        "from": "public/assets",
-        "to": "assets"
+        "from": "bin",
+        "to": "bin",
+        "filter": ["**/*"]
       }
     ],
     "win": {

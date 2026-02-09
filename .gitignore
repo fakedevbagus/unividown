@@ -39,3 +39,9 @@ build/
 *.bak
 *.backup
 *.final.*
+
+# Binary executables (keep README only)
+bin/*.exe
+bin/yt-dlp
+bin/ffmpeg
+!bin/README.md

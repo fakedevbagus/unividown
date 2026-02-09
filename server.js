@@ -23,6 +23,7 @@
  * - Automatic platform detection
  * - High compatibility mode (H.264/AAC re-encoding)
  * - Graceful shutdown
+ * - Electron desktop app support
  * ============================================================
  */
 
@@ -35,6 +36,31 @@ const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// ============================================================
+// ELECTRON DESKTOP APP SUPPORT
+// ============================================================
+// Detect if running in Electron packaged app
+const isElectronPackaged = !!process.env.UNIVIDOWN_BIN_PATH;
+const basePath = process.env.UNIVIDOWN_BASE_PATH || __dirname;
+const binPath = process.env.UNIVIDOWN_BIN_PATH || path.join(__dirname, 'bin');
+
+// Binary executables - use local bin if available, otherwise system PATH
+const YTDLP_PATH = (() => {
+    const localPath = path.join(binPath, process.platform === 'win32' ? 'yt-dlp.exe' : 'yt-dlp');
+    if (fs.existsSync(localPath)) {
+        return localPath;
+    }
+    return 'yt-dlp'; // fallback to system PATH
+})();
+
+const FFMPEG_PATH = (() => {
+    const localPath = path.join(binPath, process.platform === 'win32' ? 'ffmpeg.exe' : 'ffmpeg');
+    if (fs.existsSync(localPath)) {
+        return localPath;
+    }
+    return 'ffmpeg'; // fallback to system PATH
+})();
 
 // ============================================================
 // KONFIGURASI
@@ -72,15 +98,21 @@ const CONFIG = {
 // ============================================================
 // DIREKTORI
 // ============================================================
-const downloadsDir = path.join(__dirname, 'downloads');
-const tempDir = path.join(__dirname, 'temp');
-const subtitlesDir = path.join(__dirname, 'downloads', 'subtitles');
+const downloadsDir = path.join(basePath, 'downloads');
+const tempDir = path.join(basePath, 'temp');
+const subtitlesDir = path.join(basePath, 'downloads', 'subtitles');
 
 [downloadsDir, tempDir, subtitlesDir].forEach(dir => {
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
     }
 });
+
+// Log binary paths on startup
+console.log(`[UniviDown] Base path: ${basePath}`);
+console.log(`[UniviDown] Bin path: ${binPath}`);
+console.log(`[UniviDown] yt-dlp: ${YTDLP_PATH}`);
+console.log(`[UniviDown] ffmpeg: ${FFMPEG_PATH}`);
 
 // ============================================================
 // STATE MANAGEMENT
@@ -503,7 +535,7 @@ app.post('/api/info', infoLimiter, async (req, res) => {
     let errorOutput = '';
     let responded = false;
 
-    const ytdlp = spawn('yt-dlp', args);
+    const ytdlp = spawn(YTDLP_PATH, args);
 
     const timeout = setTimeout(() => {
         if (!responded) {
@@ -1022,12 +1054,12 @@ function downloadVideo(downloadId, url, quality, format, embedThumbnail, customF
         // High Compatibility Mode - recode to H.264/AAC for universal playback
         if (highCompatibility) {
             args.push('--recode-video', 'mp4');
-            args.push('--postprocessor-args', 'ffmpeg:-c:v libx264 -preset fast -crf 23 -c:a aac -b:a 192k');
+            args.push('--postprocessor-args', `${FFMPEG_PATH}:-c:v libx264 -preset fast -crf 23 -c:a aac -b:a 192k`);
         }
 
         args.push(url);
 
-        const ytdlp = spawn('yt-dlp', args);
+        const ytdlp = spawn(YTDLP_PATH, args);
         
         activeProcesses.set(downloadId, { 
             process: ytdlp, 
@@ -1149,7 +1181,7 @@ function downloadAudio(downloadId, url, format, merge, embedThumbnail, normalize
             if (merge && url.includes('playlist?list=')) {
                 // Ambil info playlist dulu untuk cek jumlah video
                 const countArgs = ['--flat-playlist', '--dump-json', '--no-warnings', url];
-                const countProcess = spawn('yt-dlp', countArgs);
+                const countProcess = spawn(YTDLP_PATH, countArgs);
                 let countOutput = '';
                 
                 await new Promise((resolveCount, rejectCount) => {
@@ -1215,7 +1247,7 @@ function downloadAudio(downloadId, url, format, merge, embedThumbnail, normalize
 
             args.push(url);
 
-            const ytdlp = spawn('yt-dlp', args);
+            const ytdlp = spawn(YTDLP_PATH, args);
             
             activeProcesses.set(downloadId, { 
                 process: ytdlp, 
@@ -1445,7 +1477,7 @@ function mergeAudioFiles(downloadId, inputDir, outputDir, format, normalizeAudio
 
         args.push('-y', outputFile);
 
-        const ffmpeg = spawn('ffmpeg', args);
+        const ffmpeg = spawn(FFMPEG_PATH, args);
         
         // Store ffmpeg process untuk cancel
         const processInfo = activeProcesses.get(downloadId);
