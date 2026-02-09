@@ -1,7 +1,7 @@
 # UniviDown
 
 <p align="center">
-  <img src="public/assets/logo.png" alt="UniviDown Logo" width="120">
+  <img src="public/assets/logouniversaldown.png" alt="UniviDown Logo" width="120">
 </p>
 
 <p align="center">
