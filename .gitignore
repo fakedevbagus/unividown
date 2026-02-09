@@ -41,7 +41,7 @@ build/
 *.final.*
 
 # Binary executables (keep README only)
-bin/*.exe
-bin/yt-dlp
-bin/ffmpeg
-!bin/README.md
+public/bin/*.exe
+public/bin/yt-dlp
+public/bin/ffmpeg
+!public/bin/README.md

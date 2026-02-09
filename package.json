@@ -14,7 +14,7 @@
   "build": {
     "appId": "com.unividown.app",
     "productName": "UniviDown",
-    "asar": true,
+    "asar": false,
     "directories": {
       "output": "dist"
     },
@@ -27,13 +27,6 @@
       "!node_modules/*/{CHANGELOG.md,README.md,readme.md,test,tests,*.test.js}",
       "!node_modules/.cache/**/*"
     ],
-    "extraResources": [
-      {
-        "from": "bin",
-        "to": "bin",
-        "filter": ["**/*"]
-      }
-    ],
     "win": {
       "target": [
         {
@@ -43,16 +36,13 @@
           ]
         }
       ],
-      "icon": "public/assets/logouniversaldown.ico"
+      "icon": "public/assets/logouniversaldown.png"
     },
     "nsis": {
       "oneClick": false,
       "perMachine": false,
       "allowToChangeInstallationDirectory": true,
-      "deleteAppDataOnUninstall": true,
-      "installerIcon": "public/assets/logouniversaldown.ico",
-      "uninstallerIcon": "public/assets/logouniversaldown.ico",
-      "installerHeaderIcon": "public/assets/logouniversaldown.ico"
+      "deleteAppDataOnUninstall": true
     }
   },
   "keywords": [

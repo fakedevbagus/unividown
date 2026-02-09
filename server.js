@@ -43,7 +43,7 @@ const PORT = process.env.PORT || 3000;
 // Detect if running in Electron packaged app
 const isElectronPackaged = !!process.env.UNIVIDOWN_BIN_PATH;
 const basePath = process.env.UNIVIDOWN_BASE_PATH || __dirname;
-const binPath = process.env.UNIVIDOWN_BIN_PATH || path.join(__dirname, 'bin');
+const binPath = process.env.UNIVIDOWN_BIN_PATH || path.join(__dirname, 'public', 'bin');
 
 // Binary executables - use local bin if available, otherwise system PATH
 const YTDLP_PATH = (() => {
