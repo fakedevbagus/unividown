@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Downloads and temp files
+downloads/
+temp/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build
+dist/
+build/
+
+# Backup files
+*.bak
+*.backup
+*.final.*

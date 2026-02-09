@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniviDown — Universal Media Downloader</title>
+    <meta name="description" content="UniviDown is a personal universal media downloader supporting multiple platforms with high quality audio and video.">
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <img src="/assets/logo.png" alt="UniviDown" class="logo-img">
+                <div class="logo-text">
+                    <h1>UniviDown</h1>
+                    <span class="version">v1.0.0</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn-icon" id="themeToggle" title="Toggle Theme">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                </button>
+                <button class="btn-icon" id="refreshFiles" title="Refresh Files">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
+                </button>
+                <button class="btn-icon" id="showFiles" title="Show Files">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- URL Input Section -->
+            <section class="url-section">
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        id="urlInput" 
+                        class="url-input" 
+                        placeholder="Paste URL dari YouTube, TikTok, Vimeo, Twitter, dll..."
+                        spellcheck="false"
+                        autocomplete="off"
+                    >
+                    <button class="btn-paste" id="pasteBtn" title="Paste from clipboard">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                    </button>
+                    <button class="btn-fetch" id="fetchBtn" disabled>
+                        <span class="btn-text">Fetch Info</span>
+                        <span class="btn-loader"></span>
+                    </button>
+                </div>
+                <p class="url-hint">Mendukung: YouTube, TikTok, Vimeo, Twitter, Facebook, Twitch, SoundCloud, dll.</p>
+            </section>
+
+            <!-- Preview Section -->
+            <section class="preview-section" id="previewSection" style="display: none;">
+                <!-- Skeleton Loader -->
+                <div class="skeleton-loader" id="skeletonLoader">
+                    <div class="skeleton-thumbnail"></div>
+                    <div class="skeleton-info">
+                        <div class="skeleton-title"></div>
+                        <div class="skeleton-meta"></div>
+                        <div class="skeleton-meta short"></div>
+                    </div>
+                </div>
+                
+                <!-- Preview Content -->
+                <div class="preview-content" id="previewContent">
+                    <div class="thumbnail-wrapper">
+                        <img id="thumbnail" src="" alt="Thumbnail" class="thumbnail">
+                        <span class="duration-badge" id="durationBadge">--:--</span>
+                        <span class="playlist-badge" id="playlistBadge" style="display: none;">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M21 15V6"/><path d="M18.5 18a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/><path d="M12 12H3"/><path d="M16 6H3"/><path d="M12 18H3"/></svg>
+                            <span id="videoCount">0 videos</span>
+                        </span>
+                    </div>
+                    <div class="video-info">
+                        <h2 class="video-title" id="videoTitle">Video Title</h2>
+                        <p class="video-channel" id="videoChannel">Channel Name</p>
+                        <div class="video-platform" id="videoPlatform" style="display: none;">
+                            <span class="platform-icon" id="platformIcon">🌐</span>
+                            <span class="platform-name" id="platformName">Unknown</span>
+                        </div>
+                        <div class="video-meta">
+                            <span class="meta-item" id="estimatedSize" style="display: none;">
+                                <svg class="icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                <span id="sizeValue">~0 MB</span>
+                            </span>
+                            <span class="meta-item warning" id="durationWarning" style="display: none;">
+                                <svg class="icon-sm" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                <span>Video panjang (>1 jam)</span>
+                            </span>
+                            <span class="meta-item success" id="subtitleBadge" style="display: none;">
+                                <svg class="icon-sm" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 15h4M15 15h2M7 11h2M13 11h4"/></svg>
+                                <span>Subtitle tersedia</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Download Options Section -->
+            <section class="options-section" id="optionsSection" style="display: none;">
+                <!-- Mode Toggle -->
+                <div class="mode-toggle">
+                    <button class="mode-btn active" data-mode="video">
+                        <svg class="icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+                        <span>Video</span>
+                    </button>
+                    <button class="mode-btn" data-mode="audio">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                        <span>Audio</span>
+                    </button>
+                </div>
+
+                <!-- Custom Filename -->
+                <div class="options-group">
+                    <label class="options-label">Nama File (opsional)</label>
+                    <input type="text" id="customFilename" class="custom-input" placeholder="Kosongkan untuk nama default..." maxlength="100">
+                </div>
+
+                <!-- Video Options -->
+                <div class="options-panel" id="videoOptions">
+                    <div class="options-group">
+                        <label class="options-label">Format</label>
+                        <div class="format-cards">
+                            <label class="format-card active">
+                                <input type="radio" name="videoFormat" value="mp4" checked>
+                                <span class="format-name">MP4</span>
+                                <span class="format-desc">Universal</span>
+                            </label>
+                            <label class="format-card">
+                                <input type="radio" name="videoFormat" value="webm">
+                                <span class="format-name">WebM</span>
+                                <span class="format-desc">Modern</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="options-group">
+                        <label class="options-label">Quality</label>
+                        <div class="quality-grid" id="qualityGrid">
+                            <!-- Dynamic quality options will be populated by JavaScript -->
+                            <label class="quality-option active">
+                                <input type="radio" name="videoQuality" value="best" checked>
+                                <span>Best</span>
+                            </label>
+                        </div>
+                        <div class="quality-warning" id="qualityWarning" style="display: none;">
+                            <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            <span id="qualityWarningText">Resolusi tidak tersedia, akan menggunakan yang terdekat</span>
+                        </div>
+                    </div>
+                    <div class="options-group checkboxes">
+                        <label class="checkbox-option">
+                            <input type="checkbox" id="embedThumbnailVideo" checked>
+                            <span class="checkmark"></span>
+                            <span>Embed thumbnail</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" id="highCompatibility">
+                            <span class="checkmark"></span>
+                            <span>High Compatibility Mode</span>
+                            <span class="option-hint">(Play on all devices, slower)</span>
+                        </label>
+                        <label class="checkbox-option" id="subtitleOption" style="display: none;">
+                            <input type="checkbox" id="downloadSubtitles">
+                            <span class="checkmark"></span>
+                            <span>Download subtitle</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Audio Options -->
+                <div class="options-panel" id="audioOptions" style="display: none;">
+                    <div class="options-group">
+                        <label class="options-label">Format</label>
+                        <div class="format-cards">
+                            <label class="format-card active">
+                                <input type="radio" name="audioFormat" value="mp3" checked>
+                                <span class="format-name">MP3</span>
+                                <span class="format-desc">320kbps</span>
+                            </label>
+                            <label class="format-card">
+                                <input type="radio" name="audioFormat" value="m4a">
+                                <span class="format-name">M4A</span>
+                                <span class="format-desc">Apple</span>
+                            </label>
+                            <label class="format-card">
+                                <input type="radio" name="audioFormat" value="flac">
+                                <span class="format-name">FLAC</span>
+                                <span class="format-desc">Lossless</span>
+                            </label>
+                            <label class="format-card">
+                                <input type="radio" name="audioFormat" value="opus">
+                                <span class="format-name">Opus</span>
+                                <span class="format-desc">Efficient</span>
+                            </label>
+                            <label class="format-card">
+                                <input type="radio" name="audioFormat" value="wav">
+                                <span class="format-name">WAV</span>
+                                <span class="format-desc">Raw</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="options-group checkboxes">
+                        <label class="checkbox-option" id="mergeOption" style="display: none;">
+                            <input type="checkbox" id="mergeAudio">
+                            <span class="checkmark"></span>
+                            <span>Merge playlist menjadi satu file (max 50 video)</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" id="embedThumbnailAudio" checked>
+                            <span class="checkmark"></span>
+                            <span>Embed cover art (thumbnail)</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" id="normalizeAudio">
+                            <span class="checkmark"></span>
+                            <span>Normalize audio (volume konsisten)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Download Button -->
+                <button class="btn-download" id="downloadBtn">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span>Download</span>
+                </button>
+            </section>
+
+            <!-- Progress Section -->
+            <section class="progress-section" id="progressSection" style="display: none;">
+                <div class="progress-header">
+                    <h3 class="progress-title" id="progressTitle">Downloading...</h3>
+                    <button class="btn-cancel" id="cancelBtn" title="Cancel Download">
+                        <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        <span>Cancel</span>
+                    </button>
+                </div>
+                <div class="progress-wrapper">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <span class="progress-percentage" id="progressPercentage">0%</span>
+                </div>
+                <p class="progress-status" id="progressStatus">Starting...</p>
+                <div class="progress-stages" id="progressStages">
+                    <div class="stage" data-stage="queued">
+                        <span class="stage-dot"></span>
+                        <span class="stage-label">Queued</span>
+                    </div>
+                    <div class="stage" data-stage="downloading">
+                        <span class="stage-dot"></span>
+                        <span class="stage-label">Downloading</span>
+                    </div>
+                    <div class="stage" data-stage="processing">
+                        <span class="stage-dot"></span>
+                        <span class="stage-label">Processing</span>
+                    </div>
+                    <div class="stage" data-stage="finished">
+                        <span class="stage-dot"></span>
+                        <span class="stage-label">Done</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Result Section -->
+            <section class="result-section" id="resultSection" style="display: none;">
+                <div class="result-header">
+                    <div class="result-icon success">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    </div>
+                    <h3 class="result-title" id="resultTitle">Download Complete!</h3>
+                </div>
+                <div class="result-files" id="resultFiles"></div>
+                <button class="btn-new" id="newDownloadBtn">
+                    <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <span>New Download</span>
+                </button>
+            </section>
+        </main>
+
+        <!-- File Manager Modal -->
+        <div class="modal" id="fileModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>📁 Downloaded Files</h3>
+                    <button class="btn-close" id="closeModal">
+                        <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+                <div class="modal-body" id="fileList">
+                    <div class="empty-state">
+                        <svg class="icon-lg" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        <p>Tidak ada file</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Container -->
+        <div class="toast-container" id="toastContainer"></div>
+
+        <!-- Audio element for notification -->
+        <audio id="notificationSound" src="sounds/done.mp3" preload="auto"></audio>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>UniviDown v1.0.0 • Universal Media Downloader • For personal use only</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
